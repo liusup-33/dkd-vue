@@ -1,0 +1,4 @@
+前端启动步骤
+1、安装node环境（前提）
+2、安装依赖包：npm install --registry=https://registry.npmmirror.com
+3.启动项目：npm run dev
