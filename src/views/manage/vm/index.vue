@@ -128,8 +128,9 @@
       <!-- <el-table-column label="运行状态" align="center" prop="runningStatus" /> -->
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template #default="scope">
-          <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)" v-hasPermi="['manage:vm:edit']">修改</el-button>
-          <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)" v-hasPermi="['manage:vm:remove']">删除</el-button>
+          <el-button link type="primary"  @click="handleUpdatePolicy(scope.row)" v-hasPermi="['manage:vm:edit']">策略</el-button>
+          <el-button link type="primary"  @click="handleUpdate(scope.row)" v-hasPermi="['manage:vm:edit']">修改</el-button>
+          <el-button link type="primary"  @click="handleDelete(scope.row)" v-hasPermi="['manage:vm:remove']">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -176,6 +177,26 @@
         </div>
       </template>
     </el-dialog>
+
+    <!-- 策略管理对话框 -->
+     <el-dialog title="策略管理" v-model="openPolicy" width="500px" append-to-body>
+      <el-form ref="vmRef" :model="form"  label-width="80px">
+        <el-select v-model="form.policyId" placeholder="请选择策略">
+          <el-option
+            v-for="item in policyLists"
+            :key="item.policyId"
+            :label="item.policyName"
+            :value="item.policyId"
+          />
+        </el-select>
+      </el-form>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button type="primary" @click="submitForm">确 定</el-button>
+          <el-button @click="cancel">取 消</el-button>
+        </div>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -184,6 +205,7 @@ import { listVm, getVm, delVm, addVm, updateVm } from "@/api/manage/vm";
 import { listNode } from "@/api/manage/node";
 import { listVmType } from "@/api/manage/vmType";
 import { reactive } from "vue";
+import { listPolicy } from "@/api/manage/policy";
 
 const { proxy } = getCurrentInstance();
 const { vm_status } = proxy.useDict('vm_status');
@@ -263,6 +285,7 @@ function getList() {
 // 取消按钮
 function cancel() {
   open.value = false;
+  openPolicy.value = false;
   reset();
 }
 
@@ -328,6 +351,21 @@ function handleUpdate(row) {
   });
 }
 
+const policyLists = ref([]);
+const openPolicy = ref(false);
+/** 策略列表按钮操作 */
+function handleUpdatePolicy(row) {
+  
+  form.value.policyId = row.policyId;
+  form.value.id = row.id;
+
+  //查询策略列表
+  listPolicy(queryParamsCommon).then(response => {
+    policyLists.value = response.rows;
+  });
+  openPolicy.value = true;
+}
+
 /** 提交按钮 */
 function submitForm() {
   proxy.$refs["vmRef"].validate(valid => {
@@ -336,6 +374,7 @@ function submitForm() {
         updateVm(form.value).then(response => {
           proxy.$modal.msgSuccess("修改成功");
           open.value = false;
+          openPolicy.value = false;
           getList();
         });
       } else {
