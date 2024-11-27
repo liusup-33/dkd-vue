@@ -128,6 +128,7 @@
       <!-- <el-table-column label="运行状态" align="center" prop="runningStatus" /> -->
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template #default="scope">
+          <el-button link type="primary" @click="handleGoods(scope.row)" v-hasPermi="['manage:vm:edit']">货道</el-button>
           <el-button link type="primary"  @click="handleUpdatePolicy(scope.row)" v-hasPermi="['manage:vm:edit']">策略</el-button>
           <el-button link type="primary"  @click="handleUpdate(scope.row)" v-hasPermi="['manage:vm:edit']">修改</el-button>
           <el-button link type="primary"  @click="handleDelete(scope.row)" v-hasPermi="['manage:vm:remove']">删除</el-button>
@@ -197,6 +198,10 @@
         </div>
       </template>
     </el-dialog>
+
+    <!-- 货道组件 -->
+    <ChannelDialog :goodVisible="goodVisible" :goodData="goodData" @handleCloseGood="handleCloseGood"></ChannelDialog>
+    <!-- end -->
   </div>
 </template>
 
@@ -206,6 +211,7 @@ import { listNode } from "@/api/manage/node";
 import { listVmType } from "@/api/manage/vmType";
 import { reactive } from "vue";
 import { listPolicy } from "@/api/manage/policy";
+import ChannelDialog from './components/ChannelDialog.vue';
 
 const { proxy } = getCurrentInstance();
 const { vm_status } = proxy.useDict('vm_status');
@@ -227,6 +233,18 @@ const queryParamsCommon = reactive({
 });
 const vmTyepLists = ref([]);
 
+const goodVisible = ref(false); //货道弹层显示隐藏
+const goodData = ref({}); //货道信息用来拿取 vmTypeId和innerCode
+// 打开货道弹层
+const handleGoods = (row) => {
+  goodVisible.value = true;
+  goodData.value = row;
+};
+// 关闭货道弹层
+const handleCloseGood = () => {
+  goodVisible.value = false;
+};
+// ********************货道end********************
 
 // 获取所有点位
 function getNodeList() {
@@ -410,3 +428,4 @@ getList();
 getNodeList();
 getVmTypeList();
 </script>
+<style lang="scss" scoped src="./index.scss"></style>
