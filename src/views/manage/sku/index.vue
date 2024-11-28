@@ -115,7 +115,7 @@
         <el-form-item label="规格" prop="unit">
           <el-input v-model="form.unit" placeholder="请输入规格" />
         </el-form-item>
-        <el-form-item label="商品价格" prop="price">
+        <el-form-item label="商品价格" prop="priceVo">
           <el-input-number :min="0.01" :max="99999.99" :precision="2" :step="0.5" v-model="form.priceVo" placeholder="请输入商品价格" >
           </el-input-number> 元
         </el-form-item>
